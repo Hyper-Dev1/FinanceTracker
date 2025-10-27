@@ -1,98 +1,186 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import HorizontalLine from "@/components/common/HorizontalLine";
+import Accounts from "@/components/home/Accounts";
+import { TotalFund } from "@/components/home/TotalFund";
+import Transaction from "@/components/home/Transaction";
+import styles from "@/style/AppStyles";
+import { DateNow } from "@/utils/Formatter";
+import { Picker } from "@react-native-picker/picker";
+import { Plus, X } from "lucide-react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const Index = () => {
+  const insets = useSafeAreaInsets();
 
-export default function HomeScreen() {
+  const [isVisible, setVisible] = useState(false);
+  const [ledger, setLedger] = useState("");
+  const [bank, setBank] = useState("");
+  const [amount, setAmount] = useState("");
+  const amountRef = useRef<TextInput>(null);
+
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setTimeout(() => {
+        amountRef.current?.focus();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible]);
+
+  const handleAdd = () => {
+    console.log({ ledger, bank, amount });
+    setVisible(false);
+    setLedger("");
+    setBank("");
+    setAmount("");
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <View style={{ flex: 1, position: "relative" }}>
+      <ScrollView
+        style={styles.container}
+        // contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={true}
+        contentContainerStyle={{
+          paddingBottom: insets.bottom + 100,
+        }}
+      >
+        <View style={styles.containerHeader}>
+          <Text style={styles.text}>
+            <DateNow />
+          </Text>
+          <View>
+            <Text style={[styles.subtext, { textAlign: "right" }]}>
+              Welcome Back,
+            </Text>
+            <Text style={[styles.text, { textAlign: "right" }]}>
+              Sudip!{"\n"}
+            </Text>
+          </View>
+        </View>
+        <HorizontalLine />
+        <TotalFund />
+        <HorizontalLine />
+        <Accounts />
+        <HorizontalLine />
+        <Transaction />
+      </ScrollView>
+      <TouchableOpacity
+        style={[
+          styles.floatButton,
+          {
+            position: "absolute",
+            bottom: insets.bottom + 65,
+            right: 20,
+          },
+        ]}
+        activeOpacity={0.8}
+        onPress={() => setModalVisible(true)}
+      >
+        <Plus color="#000" size={26} />
+      </TouchableOpacity>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      <Modal
+        transparent
+        animationType="slide"
+        visible={isModalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Add Transaction</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <X size={22} color="#ffffff" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ marginTop: 20 }}>
+              <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : undefined}
+                style={styles.modalContainer}
+              >
+                <Text style={styles.label}>Ledger</Text>
+                <View style={styles.pickerWrapper}>
+                  <Picker
+                    selectedValue={ledger}
+                    onValueChange={(itemValue) => setLedger(itemValue)}
+                    style={styles.pickerCont}
+                  >
+                    <Picker.Item label="Select Ledger" value="" />
+                    <Picker.Item label="Groceries" value="groceries" />
+                    <Picker.Item label="Bills" value="bills" />
+                    <Picker.Item label="Salary" value="salary" />
+                  </Picker>
+                </View>
+                <Text style={styles.label}>Bank</Text>
+                <View style={styles.pickerWrapper}>
+                  <Picker
+                    selectedValue={bank}
+                    onValueChange={(v) => setBank(v)}
+                    style={styles.pickerCont}
+                  >
+                    <Picker.Item label="Select Bank" value="" />
+                    <Picker.Item label="Nabil Bank" value="nabil" />
+                    <Picker.Item label="Global IME" value="global" />
+                    <Picker.Item label="Prabhu Bank" value="prabhu" />
+                  </Picker>
+                </View>
+                <Text style={styles.label}>Amount</Text>
+                <TextInput
+                  ref={amountRef}
+                  style={styles.input}
+                  placeholder="Enter amount"
+                  value={amount}
+                  onChangeText={setAmount}
+                  keyboardType="numeric"
+                  returnKeyType="done"
+                  placeholderTextColor="#999"
+                />
+
+                <TouchableOpacity style={styles.addButton} onPress={handleAdd}>
+                  <Text
+                    style={{ fontFamily: "SpaceMono_400Regular", fontSize: 16 }}
+                  >
+                    Add
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "SpaceMono_400Regular",
+                      fontSize: 16,
+                      color: "#999",
+                    }}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </KeyboardAvoidingView>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
-}
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+};
+export default Index;
