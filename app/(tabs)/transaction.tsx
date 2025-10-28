@@ -1,143 +1,48 @@
+import { account, ledger, transaction } from "@/components/type";
+import {
+  getAllAccounts,
+  getAllLedgers,
+  getAllTransactions,
+} from "@/database/operation";
 import styles from "@/style/AppStyles";
 import { Picker } from "@react-native-picker/picker";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TransactionItem from "../../components/home/TransactionItem";
 
 const Transaction = () => {
   const insets = useSafeAreaInsets();
+  const [transactions, setTransactions] = useState<transaction[]>([]);
+  const [accounts, setAccounts] = useState<account[]>([]);
+  const [ledgers, setLedgers] = useState<ledger[]>([]);
 
-  // Filter states
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = () => {
+    try {
+      const txData = getAllTransactions() as transaction[];
+      const accData = getAllAccounts() as account[];
+      const ledgerData = getAllLedgers() as ledger[];
+
+      setTransactions(txData);
+      setAccounts(accData);
+      setLedgers(ledgerData);
+    } catch (error) {
+      console.error("Error loading data:", error);
+    }
+  };
+
   const [selectedLedger, setSelectedLedger] = useState("");
   const [selectedBank, setSelectedBank] = useState("");
   const [selectedDateRange, setSelectedDateRange] = useState("");
 
-  const accountDetails = [
-    {
-      id: 1,
-      bankName: "Prabhu Bank",
-      anotation: "PBL",
-      amount: "99999.00",
-      type: "Current",
-    },
-    {
-      id: 2,
-      bankName: "Nabil Bank",
-      anotation: "NABIL",
-      amount: "1201",
-      type: "Salary",
-    },
-    {
-      id: 3,
-      bankName: "Agriculture Development Bank",
-      anotation: "ADB",
-      amount: "1202",
-      type: "Saving",
-    },
-    {
-      id: 4,
-      bankName: "Nepal Investment Mega Bank",
-      anotation: "NIMB",
-      amount: "1200.00",
-      type: "Investment",
-    },
-  ];
-
-  const ledgerDetails = [
-    {
-      ledgerId: 1,
-      ledgerName: "Groceries",
-    },
-  ];
-
-  const transactionDetails = [
-    {
-      transactionId: 1,
-      ledgerId: 1,
-      amount: 12300,
-      type: "add",
-      accountId: 1,
-      date: "2025-10-16 09:15:22",
-    },
-    {
-      transactionId: 2,
-      ledgerId: 1,
-      amount: 2300,
-      type: "deduct",
-      accountId: 1,
-      date: "2025-10-16 14:32:10",
-    },
-    {
-      transactionId: 3,
-      ledgerId: 1,
-      amount: 45000,
-      type: "add",
-      accountId: 2,
-      date: "2025-10-15 11:47:03",
-    },
-    {
-      transactionId: 4,
-      ledgerId: 1,
-      amount: 1200,
-      type: "deduct",
-      accountId: 2,
-      date: "2025-10-15 19:05:55",
-    },
-    {
-      transactionId: 5,
-      ledgerId: 1,
-      amount: 5800,
-      type: "deduct",
-      accountId: 3,
-      date: "2025-10-14 08:25:12",
-    },
-    {
-      transactionId: 6,
-      ledgerId: 1,
-      amount: 32000,
-      type: "add",
-      accountId: 3,
-      date: "2025-10-13 17:44:29",
-    },
-    {
-      transactionId: 7,
-      ledgerId: 1,
-      amount: 7000,
-      type: "deduct",
-      accountId: 4,
-      date: "2025-10-13 22:10:41",
-    },
-    {
-      transactionId: 8,
-      ledgerId: 1,
-      amount: 15500,
-      type: "add",
-      accountId: 4,
-      date: "2025-10-12 10:18:05",
-    },
-    {
-      transactionId: 9,
-      ledgerId: 1,
-      amount: 9600,
-      type: "add",
-      accountId: 2,
-      date: "2025-10-11 13:58:49",
-    },
-    {
-      transactionId: 10,
-      ledgerId: 1,
-      amount: 4200,
-      type: "deduct",
-      accountId: 1,
-      date: "2025-10-10 09:02:33",
-    },
-  ];
-
   const parsedTransactionDetails = useMemo(() => {
-    return transactionDetails.map((tx) => {
-      const ledger = ledgerDetails.find((l) => l.ledgerId === tx.ledgerId);
-      const account = accountDetails.find((a) => a.id === tx.accountId);
+    return transactions.map((tx) => {
+      const ledger = ledgers.find((l) => l.ledgerId === tx.ledgerId);
+      const account = accounts.find((a) => a.id === tx.accountId);
 
       const dateObj = new Date(tx.date);
       const formattedDate = `${(dateObj.getMonth() + 1)
@@ -164,7 +69,7 @@ const Transaction = () => {
 
     if (selectedLedger) {
       filtered = filtered.filter(
-        (tx) => tx.ledgerId === parseInt(selectedLedger)
+        (tx) => parseInt(tx.ledgerId) === parseInt(selectedLedger)
       );
     }
 
@@ -236,7 +141,7 @@ const Transaction = () => {
               style={styles.pickerCont}
             >
               <Picker.Item label="All Ledgers" value="" />
-              {ledgerDetails.map((ledger) => (
+              {ledgers.map((ledger) => (
                 <Picker.Item
                   key={ledger.ledgerId}
                   label={ledger.ledgerName}
@@ -256,7 +161,7 @@ const Transaction = () => {
               style={styles.pickerCont}
             >
               <Picker.Item label="All Banks" value="" />
-              {accountDetails.map((account) => (
+              {accounts.map((account) => (
                 <Picker.Item
                   key={account.id}
                   label={`${account.anotation} - ${account.type}`}

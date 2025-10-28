@@ -1,17 +1,28 @@
+import { ledger } from "@/components/type";
+import { getAllLedgers } from "@/database/operation";
 import styles from "@/style/AppStyles";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const explore = () => {
   const insets = useSafeAreaInsets();
 
-  const ledgerDetails = [
-    {
-      ledgerId: 1,
-      ledgerName: "Groceries",
-    },
-  ];
+  const [ledgers, setLedgers] = useState<account[]>([]);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = () => {
+    try {
+      const accData = getAllLedgers() as ledger[];
+
+      setLedgers(accData);
+    } catch (error) {
+      console.error("Error loading data:", error);
+    }
+  };
 
   return (
     <ScrollView
@@ -25,7 +36,7 @@ const explore = () => {
         <Text style={styles.pageHeaderText}>Ledger</Text>
       </View>
 
-      {ledgerDetails.map((l) => (
+      {ledgers.map((l) => (
         <View key={l.ledgerId}>
           <View style={styles.ledgerItem}>
             <Text style={styles.ledgerText}>{l.ledgerName}</Text>

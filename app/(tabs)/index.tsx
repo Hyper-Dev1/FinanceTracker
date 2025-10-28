@@ -2,6 +2,7 @@ import HorizontalLine from "@/components/common/HorizontalLine";
 import Accounts from "@/components/home/Accounts";
 import { TotalFund } from "@/components/home/TotalFund";
 import Transaction from "@/components/home/Transaction";
+import { initDatabase } from "@/database/db";
 import styles from "@/style/AppStyles";
 import { DateNow } from "@/utils/Formatter";
 import { Picker } from "@react-native-picker/picker";
@@ -20,6 +21,11 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const Index = () => {
+  useEffect(() => {
+    initDatabase();
+    // seedDatabase();
+  }, []);
+
   const insets = useSafeAreaInsets();
 
   const [isVisible, setVisible] = useState(false);
