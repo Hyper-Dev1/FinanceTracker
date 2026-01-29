@@ -40,4 +40,12 @@ export const initDatabase = () => {
   }
 };
 
+export const resetDatabase = () => {
+  db.execSync(`
+    DELETE FROM accounts;
+    DELETE FROM transactions;
+    DELETE FROM ledgers;
+    `);
+};
+
 export default db;

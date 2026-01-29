@@ -1,7 +1,13 @@
 import { SpaceMono_400Regular, useFonts } from "@expo-google-fonts/space-mono";
 import { Tabs } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { CreditCard, GalleryHorizontalIcon, Home, Landmark } from "lucide-react-native";
+import {
+  CreditCard,
+  GalleryHorizontalIcon,
+  Home,
+  Landmark,
+  User,
+} from "lucide-react-native";
 import React, { useCallback } from "react";
 import { View } from "react-native";
 
@@ -29,7 +35,7 @@ export default function TabLayout() {
           headerShown: false,
           tabBarStyle: {
             backgroundColor: "#1e1e1e",
-            height: 100,
+            height: 105,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             position: "absolute",
@@ -38,6 +44,7 @@ export default function TabLayout() {
             right: 0,
             shadowRadius: 3,
             elevation: 5,
+            borderColor: "#1e1e1e",
           },
           tabBarLabelStyle: {
             fontFamily: "SpaceMono_400Regular",
@@ -58,18 +65,22 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="ledger"
+          name="category"
           options={{
-            title: "Ledger",
+            title: "Category",
             tabBarIcon: ({ color, size }) => (
-              <GalleryHorizontalIcon color={color} size={size} strokeWidth={1.8} />
+              <GalleryHorizontalIcon
+                color={color}
+                size={size}
+                strokeWidth={1.8}
+              />
             ),
           }}
         />
         <Tabs.Screen
-          name="bank"
+          name="account"
           options={{
-            title: "Bank",
+            title: "Account",
             tabBarIcon: ({ color, size }) => (
               <Landmark color={color} size={size} strokeWidth={1.8} />
             ),
@@ -81,6 +92,15 @@ export default function TabLayout() {
             title: "Transaction",
             tabBarIcon: ({ color, size }) => (
               <CreditCard color={color} size={size} strokeWidth={1.8} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: "Profile",
+            tabBarIcon: ({ color, size }) => (
+              <User color={color} size={size} strokeWidth={1.8} />
             ),
           }}
         />

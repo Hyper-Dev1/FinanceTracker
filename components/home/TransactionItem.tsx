@@ -1,33 +1,30 @@
+import { transaction } from "@/components/type";
 import styles from "@/style/AppStyles";
+import { formatDate } from "@/utils/Formatter";
 import React from "react";
 import { Text, View } from "react-native";
 
-interface TransactionItems {
-  transactionId: number;
-  ledgerName: string;
-  accountName: string;
-  accountType: string;
-  amount: number;
-  type: string;
-  date: string;
-}
 
 type Props = {
-  data: TransactionItems;
+  data: transaction;
 };
 
 const TransactionItem: React.FC<Props> = ({ data }) => {
   return (
     <View style={styles.transactionCard}>
       <View>
-        <Text style={styles.transactionCardText}>{data.ledgerName}</Text>
-        <Text style={styles.transactionCardText}>({data.accountName})</Text>
+        <Text style={styles.transactionCardText}>
+          {data.category_name || "null"}
+        </Text>
+        <Text style={styles.transactionCardText}>
+          ({data.account_name || "null"})
+        </Text>
       </View>
       <View>
         <Text style={styles.transactionCardText}>
-          {data.type === "deduct" ? "-" : ""}Rs {data.amount}
+          {data.is_deduct ? "-" : ""}Rs {data.amount}
         </Text>
-        <Text style={styles.transactionCardText}>{data.date}</Text>
+        <Text style={styles.transactionCardText}>{formatDate(data.createdAt)}</Text>
       </View>
     </View>
   );

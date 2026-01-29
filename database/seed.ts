@@ -6,12 +6,7 @@ export const seedDatabase = () => {
     insertAccount("Prabhu Bank", "PBL", "0", "Current");
     insertAccount("Nabil Bank", "NABIL", "0", "Salary");
     insertAccount("Agriculture Development Bank", "ADB", "0", "Saving");
-    insertAccount(
-      "Nepal Investment Mega Bank",
-      "NIMB",
-      "0",
-      "Investment"
-    );
+    insertAccount("Nepal Investment Mega Bank", "NIMB", "0", "Investment");
 
     // Insert ledgers
     insertLedger("Groceries");

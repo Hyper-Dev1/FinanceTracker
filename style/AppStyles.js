@@ -1,4 +1,6 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
+
+const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {
@@ -6,6 +8,7 @@ const styles = StyleSheet.create({
     paddingTop: 35,
     backgroundColor: "#1a1a1a",
     // position: "relative",
+    flex: 1,
   },
   containerHeader: {
     width: "100%",
@@ -94,7 +97,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "white",
     borderCurve: "circular",
-    height: 110,
+    height: 90,
     width: 180,
     borderRadius: 5,
     padding: 10,
@@ -213,6 +216,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 15,
     paddingLeft: 10,
+    // marginTop: "5px",
     color: "white",
     fontFamily: "SpaceMono_400Regular",
   },
@@ -232,6 +236,33 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderWidth: 1,
     borderColor: "#999",
+  },
+  toggleContainer: {
+    flexDirection: "row",
+    backgroundColor: "#1a1a1a",
+    borderRadius: 8,
+    padding: 4,
+    marginBottom: 16,
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+    alignItems: "center",
+  },
+  toggleButtonActive: {
+    backgroundColor: "#333",
+  },
+  toggleButtonText: {
+    fontSize: 14,
+    color: "#666",
+    fontWeight: "500",
+    fontFamily: "SpaceMono_400Regular",
+  },
+  toggleButtonTextActive: {
+    color: "#e0e0e0",
+    fontWeight: "600",
   },
 
   // ************** Modal **************
@@ -318,6 +349,128 @@ const styles = StyleSheet.create({
     color: "white",
     fontFamily: "SpaceMono_400Regular",
     fontSize: 16,
+  },
+
+  // ************** Onboarding **************
+
+  pageInput: {
+    borderWidth: 1,
+    borderColor: "#999",
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 14,
+    marginBottom: 15,
+    paddingLeft: 10,
+    // marginTop: "5px",
+    color: "white",
+    fontFamily: "SpaceMono_400Regular",
+  },
+
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+  },
+
+  title: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 30,
+    // textAlign: "center",
+    color: "white",
+    paddingBottom: 20,
+    lineHeight: 34,
+  },
+  subtitle: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 18,
+    lineHeight: 24,
+    color: "gray",
+    // textAlign: "center",
+  },
+  footer: {
+    paddingHorizontal: 24,
+    paddingBottom: 48,
+    alignItems: "center",
+  },
+  button: {
+    backgroundColor: "white",
+    paddingVertical: 10,
+    paddingHorizontal: 32,
+    borderRadius: 4,
+    width: width - 48,
+    alignItems: "center",
+    shadowColor: "white",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+    color: "black",
+  },
+  buttonPressed: {
+    backgroundColor: "white",
+    transform: [{ scale: 0.98 }],
+  },
+  buttonText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 18,
+  },
+  footerText: {
+    fontFamily: "SpaceMono_400Regular",
+    color: "#6B7280",
+    fontSize: 12,
+    marginTop: 16,
+  },
+
+  // **************************** Login ****************************
+
+  loginPageTitle: {
+    fontSize: 25,
+    fontFamily: "SpaceMono_400Regular",
+    // textAlign: "center",
+    color: "white",
+    paddingBottom: 20,
+    lineHeight: 34,
+  },
+
+  formWrapper: {
+    // flex: 1,
+    // justifyContent: "center",
+    alignItems: "flex-start",
+    width: width - 48,
+    paddingHorizontal: 24,
+  },
+
+  formInput: {
+    borderWidth: 1,
+    borderColor: "#999",
+    borderRadius: 5,
+    padding: 10,
+    fontSize: 14,
+    marginBottom: 15,
+    paddingLeft: 10,
+    // marginTop: "5px",
+    width: "100%",
+    color: "white",
+    fontFamily: "SpaceMono_400Regular",
+  },
+  formLabel: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "white",
+    paddingBottom: 10,
+  },
+
+  formUrl: {
+    paddingVertical: 10,
+    textAlign: "right",
+  },
+  formUrlText: {
+    textAlign: "right",
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "white",
+    paddingBottom: 10,
   },
 });
 

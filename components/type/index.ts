@@ -1,21 +1,35 @@
+import { Timestamp } from "firebase/firestore";
+
 export type account = {
-  id: number;
-  bankName: string;
+  id: string;
+  account_name: string;
   anotation: string;
-  amount: number;
-  type: string;
+  opening_balance: number;
+  running_balance: number;
+  snapshot_balance: number;
+  snapshot_date: string;
+  account_type: string;
+  user_id: string;
 };
 
-export type ledger = {
-  ledgerId: string;
-  ledgerName: string;
+export type category = {
+  id: string;
+  category_name: string;
 };
 
 export type transaction = {
-  transactionId: number;
-  ledgerId: string;
+  id: string;
+  category_id: string;
+  category_name?: string;
   amount: number;
-  type: string;
-  accountId: number;
-  date: string;
+  account_id: string;
+  account_name?: string;
+  createdAt: Timestamp;
+  is_deduct: boolean;
+};
+
+export type User = {
+  email: string;
+  name: string;
+  uid: string;
 };

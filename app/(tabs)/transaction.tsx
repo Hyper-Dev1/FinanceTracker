@@ -1,183 +1,187 @@
-import { account, ledger, transaction } from "@/components/type";
+import { account, category, transaction } from "@/components/type";
 import {
   getAllAccounts,
-  getAllLedgers,
-  getAllTransactions,
-} from "@/database/operation";
+  getAllCategory,
+  getAllTransaction,
+} from "@/database/firebaseOperation";
 import styles from "@/style/AppStyles";
+import {
+  buildAccountMap,
+  buildCategoryMap,
+  filterAndParseTransactions,
+} from "@/utils/Formatter";
 import { Picker } from "@react-native-picker/picker";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TransactionItem from "../../components/home/TransactionItem";
 
 const Transaction = () => {
   const insets = useSafeAreaInsets();
+
   const [transactions, setTransactions] = useState<transaction[]>([]);
   const [accounts, setAccounts] = useState<account[]>([]);
-  const [ledgers, setLedgers] = useState<ledger[]>([]);
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = () => {
-    try {
-      const txData = getAllTransactions() as transaction[];
-      const accData = getAllAccounts() as account[];
-      const ledgerData = getAllLedgers() as ledger[];
-
-      setTransactions(txData);
-      setAccounts(accData);
-      setLedgers(ledgerData);
-    } catch (error) {
-      console.error("Error loading data:", error);
-    }
-  };
+  const [categories, setCategories] = useState<category[]>([]);
+  const [recordAccounts, setRecordAccounts] = useState<Record<string, string>>(
+    {}
+  );
+  const [recordCategories, setRecordCategories] = useState<
+    Record<string, string>
+  >({});
 
   const [selectedLedger, setSelectedLedger] = useState("");
   const [selectedBank, setSelectedBank] = useState("");
   const [selectedDateRange, setSelectedDateRange] = useState("");
 
-  const parsedTransactionDetails = useMemo(() => {
-    return transactions.map((tx) => {
-      const ledger = ledgers.find((l) => l.ledgerId === tx.ledgerId);
-      const account = accounts.find((a) => a.id === tx.accountId);
+  // Load accounts and categories once
+  useEffect(() => {
+    const loadStaticData = async () => {
+      try {
+        const accData = await getAllAccounts();
+        const recordAccData = buildAccountMap(accData);
+        const catData = await getAllCategory();
+        const recordCatData = buildCategoryMap(catData);
+        setAccounts(accData);
+        setRecordAccounts(recordAccData);
+        setRecordCategories(recordCatData);
+        setCategories(catData);
+      } catch (err) {
+        console.error("Error loading static data:", err);
+      }
+    };
 
-      const dateObj = new Date(tx.date);
-      const formattedDate = `${(dateObj.getMonth() + 1)
-        .toString()
-        .padStart(2, "0")}/${dateObj.getDate().toString().padStart(2, "0")}`;
-
-      return {
-        transactionId: tx.transactionId,
-        ledgerId: tx.ledgerId,
-        ledgerName: ledger?.ledgerName || "Unknown Ledger",
-        accountId: tx.accountId,
-        accountName: account?.anotation || "Unknown Account",
-        accountType: account?.type || "Unknown",
-        amount: tx.amount,
-        type: tx.type,
-        date: formattedDate,
-        dateObj: dateObj,
-      };
-    });
+    loadStaticData();
   }, []);
 
-  const filteredTransactions = useMemo(() => {
-    let filtered = [...parsedTransactionDetails];
+  // Fetch transactions whenever filters change
+  useEffect(() => {
+    const loadTransactions = async () => {
+      try {
+        const now = new Date();
 
-    if (selectedLedger) {
-      filtered = filtered.filter(
-        (tx) => parseInt(tx.ledgerId) === parseInt(selectedLedger)
-      );
-    }
-
-    if (selectedBank) {
-      filtered = filtered.filter(
-        (tx) => tx.accountId === parseInt(selectedBank)
-      );
-    }
-
-    if (selectedDateRange) {
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-      filtered = filtered.filter((tx) => {
-        const txDate = new Date(
-          tx.dateObj.getFullYear(),
-          tx.dateObj.getMonth(),
-          tx.dateObj.getDate()
-        );
+        let startDate: Date | undefined;
+        let endDate: Date | undefined;
 
         switch (selectedDateRange) {
           case "today":
-            return txDate.getTime() === today.getTime();
-          case "week":
-            const weekAgo = new Date(today);
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            return txDate >= weekAgo;
-          case "month":
-            const monthAgo = new Date(today);
-            monthAgo.setMonth(monthAgo.getMonth() - 1);
-            return txDate >= monthAgo;
-          case "year":
-            const yearAgo = new Date(today);
-            yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-            return txDate >= yearAgo;
-          default:
-            return true;
-        }
-      });
-    }
+            startDate = new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate()
+            );
+            endDate = now;
+            break;
 
-    return filtered;
-  }, [
-    parsedTransactionDetails,
-    selectedLedger,
-    selectedBank,
-    selectedDateRange,
-  ]);
+          case "week":
+            startDate = new Date(now);
+            startDate.setDate(startDate.getDate() - 7);
+            endDate = now;
+            break;
+
+          case "month":
+            startDate = new Date(now);
+            startDate.setMonth(startDate.getMonth() - 1);
+            endDate = now;
+            break;
+
+          case "year":
+            startDate = new Date(now);
+            startDate.setFullYear(startDate.getFullYear() - 1);
+            endDate = now;
+            break;
+
+          case "all":
+          default:
+            startDate = undefined;
+            endDate = undefined;
+            break;
+        }
+
+        const filter = {
+          categoryId: selectedLedger,
+          accountId: selectedBank,
+          startDate: startDate,
+          endDate: endDate,
+        };
+
+        const txData = await getAllTransaction();
+        const parsedTxData = filterAndParseTransactions(
+          txData,
+          recordAccounts,
+          recordCategories,
+          filter
+        );
+
+        setTransactions(parsedTxData);
+      } catch (error) {
+        console.error("Error loading transactions:", error);
+      }
+    };
+
+    loadTransactions();
+  }, [selectedLedger, selectedBank, selectedDateRange]);
 
   return (
     <ScrollView
       style={styles.container}
       showsVerticalScrollIndicator={true}
-      contentContainerStyle={{
-        paddingBottom: insets.bottom + 100,
-      }}
+      contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
     >
       <View style={styles.transactiontPageHeader}>
         <Text style={styles.transactionPageHeaderText}>Transactions</Text>
       </View>
 
+      {/* Filters */}
       <View style={styles.filterContainer}>
+        {/* Ledger / Category */}
         <View style={styles.filterItem}>
           <Text style={styles.filterLabel}>Ledger</Text>
           <View style={styles.pickerWrapper}>
             <Picker
               selectedValue={selectedLedger}
-              onValueChange={(value) => setSelectedLedger(value)}
+              onValueChange={setSelectedLedger}
               style={styles.pickerCont}
             >
               <Picker.Item label="All Ledgers" value="" />
-              {ledgers.map((ledger) => (
+              {categories.map((c) => (
                 <Picker.Item
-                  key={ledger.ledgerId}
-                  label={ledger.ledgerName}
-                  value={ledger.ledgerId.toString()}
+                  key={c.id}
+                  label={c.category_name}
+                  value={c.id.toString()}
                 />
               ))}
             </Picker>
           </View>
         </View>
 
+        {/* Bank / Account */}
         <View style={styles.filterItem}>
           <Text style={styles.filterLabel}>Bank</Text>
           <View style={styles.pickerWrapper}>
             <Picker
               selectedValue={selectedBank}
-              onValueChange={(value) => setSelectedBank(value)}
+              onValueChange={setSelectedBank}
               style={styles.pickerCont}
             >
               <Picker.Item label="All Banks" value="" />
-              {accounts.map((account) => (
+              {accounts.map((a) => (
                 <Picker.Item
-                  key={account.id}
-                  label={`${account.anotation} - ${account.type}`}
-                  value={account.id.toString()}
+                  key={a.id}
+                  label={`${a.anotation} - ${a.account_type}`}
+                  value={a.id.toString()}
                 />
               ))}
             </Picker>
           </View>
         </View>
 
+        {/* Date Range */}
         <View style={styles.filterItem}>
           <Text style={styles.filterLabel}>Date Range</Text>
           <View style={styles.pickerWrapper}>
             <Picker
               selectedValue={selectedDateRange}
-              onValueChange={(value) => setSelectedDateRange(value)}
+              onValueChange={setSelectedDateRange}
               style={styles.pickerCont}
             >
               <Picker.Item label="All Time" value="" />
@@ -190,18 +194,18 @@ const Transaction = () => {
         </View>
       </View>
 
+      {/* Results count */}
       <View style={styles.resultsCount}>
         <Text style={styles.resultsCountText}>
-          {filteredTransactions.length} transaction
-          {filteredTransactions.length !== 1 ? "s" : ""}
+          {transactions.length} transaction
+          {transactions.length !== 1 ? "s" : ""}
         </Text>
       </View>
 
+      {/* Transaction list */}
       <View style={styles.transactionCardGroup}>
-        {filteredTransactions.length > 0 ? (
-          filteredTransactions.map((acc) => (
-            <TransactionItem data={acc} key={acc.transactionId} />
-          ))
+        {transactions.length > 0 ? (
+          transactions.map((tx) => <TransactionItem data={tx} key={tx.id} />)
         ) : (
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>No transactions found</Text>

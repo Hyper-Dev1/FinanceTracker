@@ -40,21 +40,46 @@ export const getAllLedgers = () => {
 };
 
 export const deleteLedger = (ledgerId: number) => {
+  console.log(ledgerId)
   return db.runSync("DELETE FROM ledgers WHERE ledgerId = ?", [ledgerId]);
 };
 
-// Transaction Operations
-export const insertTransaction = (
-  ledgerId: number,
-  amount: number,
-  type: string,
-  accountId: number,
-  date: string
-) => {
-  return db.runSync(
-    "INSERT INTO transactions (ledgerId, amount, type, accountId, date) VALUES (?, ?, ?, ?, ?)",
-    [ledgerId, amount, type, accountId, date]
-  );
+export const insertTransaction = ({
+  ledgerId,
+  amount,
+  type,
+  accountId,
+  date,
+}: {
+  ledgerId: string;
+  amount: number;
+  type: string;
+  accountId: string;
+  date: string;
+}) => {
+  return db.withTransactionSync(() => {
+    db.runSync(
+      `INSERT INTO transactions 
+        (ledgerId, amount, type, accountId, date) 
+        VALUES (?, ?, ?, ?, ?)`,
+      [ledgerId, amount, type, accountId, date]
+    );
+    if (type === "deduct"){
+      db.runSync(
+        `UPDATE accounts 
+          SET amount = amount - ? 
+          WHERE id = ?`,
+        [amount, accountId]
+      );
+    } else{
+      db.runSync(
+        `UPDATE accounts 
+          SET amount = amount + ? 
+          WHERE id = ?`,
+        [amount, accountId]
+      );
+    }
+  });
 };
 
 export const getAllTransactions = () => {
@@ -102,6 +127,20 @@ export const getAccountBalance = (accountId: number) => {
   ) as { balance: number } | null;
 
   return result?.balance || 0;
+};
+
+export const getAllAccountBalance = () => {
+  const result = db.getFirstSync(`select sum(a.amount) as balance from accounts a`) as {
+    balance: number;
+  } | null;
+
+  return result?.balance || 0;
+};
+
+export const getAllDetailedTransaction = () => {
+  return db.getAllSync(
+    `select t."transactionId", l."ledgerName", a."anotation", a.type as accountType, t.date, t.amount, t.type from transactions t left join accounts a on a.id = t."accountId" left join ledgers l on l."ledgerId" = t."ledgerId" order by t.date desc limit 10 `
+  );
 };
 
 export const getLedgerTotal = (ledgerId: number) => {
