@@ -5,7 +5,11 @@ import {
   getAllTransaction,
 } from "@/database/firebaseOperation";
 import styles from "@/style/AppStyles";
-import { buildAccountMap, buildCategoryMap, filterAndParseTransactions } from "@/utils/Formatter";
+import {
+  buildAccountMap,
+  buildCategoryMap,
+  filterAndParseTransactions,
+} from "@/utils/Formatter";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import TransactionItem from "../../components/home/TransactionItem";
@@ -13,7 +17,7 @@ import TransactionItem from "../../components/home/TransactionItem";
 const Transaction = () => {
   const [transactions, setTransactions] = useState<transaction[]>([]);
   const [recordAccounts, setRecordAccounts] = useState<Record<string, string>>(
-    {}
+    {},
   );
   const [recordCategories, setRecordCategories] = useState<
     Record<string, string>
@@ -31,14 +35,13 @@ const Transaction = () => {
         setRecordAccounts(recordAccData);
         setRecordCategories(recordCatData);
       } catch (err) {
-        console.error("Error loading static data:", err);
+        // console.error("Error loading static data:", err);
       }
     };
 
     loadStaticData();
   }, []);
 
-  // Fetch transactions whenever filters change
   useEffect(() => {
     const loadTransactions = async () => {
       try {
@@ -49,13 +52,13 @@ const Transaction = () => {
           txData,
           recordAccounts,
           recordCategories,
-          filter
+          filter,
         );
 
         setTransactions(parsedTxData);
         setLoading(false);
       } catch (error) {
-        console.error("Error loading transactions:", error);
+        // console.error("Error loading transactions:", error);
       }
     };
 
@@ -63,20 +66,26 @@ const Transaction = () => {
   }, [recordAccounts, recordCategories, transactions]);
 
   if (loading) {
-    return <Text>Loading transactions...</Text>;
+    return (
+      <View>
+        <Text style={styles.transactionEmptyText}>Loading transactions...</Text>
+      </View>
+    );
   }
 
   return (
     <View>
       <View style={styles.transactiontHeader}>
-        <Text style={styles.transactionHeaderText}>Transactions</Text>
+        <Text style={styles.transactionHeaderText}>Recent Transactions</Text>
       </View>
 
       <View style={styles.transactionCardGroup}>
         {transactions.length > 0 ? (
-          transactions.map((tx) => <TransactionItem data={tx} key={tx.id} />)
+          transactions
+            .slice(0, 5)
+            .map((tx) => <TransactionItem data={tx} key={tx.id} />)
         ) : (
-          <Text>No transactions found</Text>
+          <Text style={styles.transactionEmptyText}>No transactions yet</Text>
         )}
       </View>
     </View>

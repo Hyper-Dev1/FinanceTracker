@@ -1,5 +1,7 @@
+import ForecastCard from "@/components/common/ForecastCard";
 import HorizontalLine from "@/components/common/HorizontalLine";
 import Accounts from "@/components/home/Accounts";
+import Summary from "@/components/home/Summary";
 import { TotalFund } from "@/components/home/TotalFund";
 import Transaction from "@/components/home/Transaction";
 import { User } from "@/components/type";
@@ -7,9 +9,14 @@ import {
   createTransaction,
   getAllAccounts,
   getAllCategory,
+  getAllTransaction,
   getCurrentUser,
 } from "@/database/firebaseOperation";
 import styles from "@/style/AppStyles";
+import {
+  calculateBalanceForecast,
+  ForecastResult,
+} from "@/utils/BalanceForecast";
 import { DateNow } from "@/utils/Formatter";
 import { Picker } from "@react-native-picker/picker";
 import { Plus, X } from "lucide-react-native";
@@ -31,9 +38,10 @@ const Index = () => {
   const [bankDetails, setBankDetails] = useState<any[]>([]);
   const [categoryList, setCategoryList] = useState<any[]>([]);
   const [transactionType, setTransactionType] = useState<"deduct" | "add">(
-    "deduct"
+    "deduct",
   );
   const [user, setUser] = useState<User>();
+  const [forecast, setForecast] = useState<ForecastResult | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -49,11 +57,23 @@ const Index = () => {
       try {
         const banks = await getAllAccounts();
         const category = await getAllCategory();
+        const allTransactions = await getAllTransaction();
 
         setBankDetails(banks);
         setCategoryList(category);
+
+        // Calculate forecast
+        const totalBalance = banks.reduce(
+          (sum, b) => sum + (b.running_balance || 0),
+          0,
+        );
+        const prediction = calculateBalanceForecast(
+          allTransactions,
+          totalBalance,
+        );
+        setForecast(prediction);
       } catch (error) {
-        console.error("❌ Database initialization failed:", error);
+        console.error("Database initialization failed:", error);
       }
     };
 
@@ -127,6 +147,15 @@ const Index = () => {
           </View>
           <HorizontalLine />
           <TotalFund />
+
+          {forecast && (
+            <View style={{ marginTop: 20 }}>
+              <ForecastCard forecast={forecast} />
+            </View>
+          )}
+
+          <HorizontalLine />
+          <Summary />
           <HorizontalLine />
           <Accounts />
           <HorizontalLine />

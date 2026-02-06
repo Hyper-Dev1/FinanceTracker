@@ -4,7 +4,6 @@ import { formatDate } from "@/utils/Formatter";
 import React from "react";
 import { Text, View } from "react-native";
 
-
 type Props = {
   data: transaction;
 };
@@ -12,19 +11,26 @@ type Props = {
 const TransactionItem: React.FC<Props> = ({ data }) => {
   return (
     <View style={styles.transactionCard}>
-      <View>
-        <Text style={styles.transactionCardText}>
-          {data.category_name || "null"}
+      <View style={styles.transactionCardLeft}>
+        <Text style={styles.transactionCardCategory}>
+          {data.category_name || "Uncategorized"}
         </Text>
-        <Text style={styles.transactionCardText}>
-          ({data.account_name || "null"})
+        <Text style={styles.transactionCardAccount}>
+          {data.account_name || "Unknown Account"}
         </Text>
       </View>
-      <View>
-        <Text style={styles.transactionCardText}>
-          {data.is_deduct ? "-" : ""}Rs {data.amount}
+      <View style={styles.transactionCardRight}>
+        <Text
+          style={[
+            styles.transactionCardAmount,
+            data.is_deduct && styles.transactionCardAmountDeduct,
+          ]}
+        >
+          {data.is_deduct ? "-" : "+"}Rs {data.amount}
         </Text>
-        <Text style={styles.transactionCardText}>{formatDate(data.createdAt)}</Text>
+        <Text style={styles.transactionCardDate}>
+          {formatDate(data.createdAt)}
+        </Text>
       </View>
     </View>
   );

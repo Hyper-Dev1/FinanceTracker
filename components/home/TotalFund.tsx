@@ -29,6 +29,7 @@ export const TotalFund = () => {
 
   return (
     <View style={styles.homeHeader}>
+      <Text style={styles.homeHeaderLabel}>Total Balance</Text>
       <Text style={styles.homeHeaderAmount}>
         Rs {loading ? "0" : formatCurrency(amount)}
       </Text>

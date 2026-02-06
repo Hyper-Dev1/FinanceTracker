@@ -1,19 +1,18 @@
 import HorizontalLine from "@/components/common/HorizontalLine";
-import { account } from "@/components/type";
+import { category } from "@/components/type";
 import {
-  createAccounts,
-  deleteAccounts,
-  getAllAccounts,
+  createCategory,
+  deleteCategory,
+  getAllCategory,
 } from "@/database/firebaseOperation";
 import styles from "@/style/AppStyles";
-import { Plus, X } from "lucide-react-native";
-import React, { useEffect, useState } from "react";
+import { ArrowLeft, Plus, X } from "lucide-react-native";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
-  Pressable,
   ScrollView,
   Text,
   TextInput,
@@ -22,16 +21,17 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const Accounts = () => {
+interface CategoryProps {
+  onClose?: () => void;
+}
+
+const Category = ({ onClose }: CategoryProps) => {
   const insets = useSafeAreaInsets();
 
-  const [accounts, setAccounts] = useState<account[]>([]);
-
-  const [accountName, setAccountName] = useState<string>("");
-  const [annotation, setAnnotation] = useState<string>("");
-  const [openingBalance, setOpeningBalance] = useState<number>(0);
-  const [accountType, setAccountType] = useState<string>("");
-  const [modelVisible, setModelVisible] = useState<boolean>(false);
+  const [categoryList, setCategoryList] = useState<category[]>([]);
+  const amountRef = useRef<TextInput>(null);
+  const [categoryName, setCategoryName] = useState("");
+  const [modelView, setModelView] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -39,9 +39,8 @@ const Accounts = () => {
 
   const loadData = async () => {
     try {
-      const accData = await getAllAccounts();
-
-      setAccounts(accData);
+      const data = await getAllCategory();
+      setCategoryList(data);
     } catch (error) {
       console.error("Error loading data:", error);
     }
@@ -49,24 +48,16 @@ const Accounts = () => {
 
   const handleAdd = () => {
     try {
-      createAccounts({
-        account_name: accountName,
-        anotation: annotation,
-        opening_balance: openingBalance,
-        account_type: accountType,
-      });
+      createCategory(categoryName);
       loadData();
-      setModelVisible(false);
-      setAccountName("");
-      setAnnotation("");
-      setAccountType("");
-      setOpeningBalance(0);
+      setModelView(false);
+      setCategoryName("");
     } catch {
-      console.log("Error adding accounts");
+      console.log("Error adding category");
     }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = ({ id }: { id: string }) => {
     Alert.alert("Delete item?", "This action cannot be undone.", [
       { text: "Cancel", style: "cancel" },
       {
@@ -76,13 +67,20 @@ const Accounts = () => {
       },
     ]);
   };
+
   const deleteItem = ({ id }: { id: string }) => {
     try {
-      deleteAccounts(id);
+      deleteCategory(id);
       loadData();
       console.log("Deleted");
     } catch {
       console.log("Error Deleting Ledger");
+    }
+  };
+
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
     }
   };
 
@@ -95,22 +93,34 @@ const Accounts = () => {
           paddingBottom: insets.bottom + 100,
         }}
       >
-        <View style={styles.pageHeader}>
-          <Text style={styles.pageHeaderText}>Accounts</Text>
-          <Pressable></Pressable>
+        {/* Header with back and close icons */}
+        <View style={styles.categoryScreenHeader}>
+          <View style={styles.categoryScreenHeaderLeft}>
+            <TouchableOpacity
+              style={styles.headerIconButton}
+              onPress={handleClose}
+            >
+              <ArrowLeft color="#fff" size={24} />
+            </TouchableOpacity>
+            <Text style={styles.categoryScreenTitle}>Category</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.headerIconButton}
+            onPress={handleClose}
+          >
+            <X color="#fff" size={24} />
+          </TouchableOpacity>
         </View>
 
-        {accounts.map((a) => (
+        {categoryList.map((c) => (
           <TouchableOpacity
-            key={a.id}
-            onLongPress={() => handleDelete(a.id)}
+            key={c.id}
+            onLongPress={() => handleDelete({ id: c.id })}
             delayLongPress={250}
           >
-            <View key={a.id}>
+            <View>
               <View style={styles.ledgerItem}>
-                <Text style={styles.ledgerText}>
-                  {a.account_name}({a.anotation})
-                </Text>
+                <Text style={styles.ledgerText}>{c.category_name}</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -126,23 +136,23 @@ const Accounts = () => {
           },
         ]}
         activeOpacity={0.8}
-        onPress={() => setModelVisible(true)}
+        onPress={() => setModelView(true)}
       >
         <Plus color="#000" size={26} />
       </TouchableOpacity>
       <Modal
         transparent
         animationType="slide"
-        visible={modelVisible}
-        onRequestClose={() => setModelVisible(false)}
+        visible={modelView}
+        onRequestClose={() => setModelView(false)}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Add Account</Text>
+              <Text style={styles.modalTitle}>Add Category</Text>
               <TouchableOpacity
                 style={styles.closeButton}
-                onPress={() => setModelVisible(false)}
+                onPress={() => setModelView(false)}
               >
                 <X size={22} color="#ffffff" />
               </TouchableOpacity>
@@ -154,47 +164,14 @@ const Accounts = () => {
                 style={styles.modalContainer}
               >
                 <HorizontalLine />
-                <Text style={styles.label}>Account Name</Text>
+                <Text style={styles.label}>Add Category</Text>
                 <View>
                   <TextInput
+                    ref={amountRef}
                     style={styles.pageInput}
-                    placeholder="Enter Account Name (Eg: Prabhu Bank)"
-                    value={accountName}
-                    onChangeText={setAccountName}
-                    returnKeyType="done"
-                    placeholderTextColor="#999"
-                  />
-                </View>
-                <Text style={styles.label}>Account Name Annotation</Text>
-                <View>
-                  <TextInput
-                    style={styles.pageInput}
-                    placeholder="Enter annotation (Eg: PBL)"
-                    value={annotation}
-                    onChangeText={setAnnotation}
-                    returnKeyType="done"
-                    placeholderTextColor="#999"
-                  />
-                </View>
-                <Text style={styles.label}>Account Type</Text>
-                <View>
-                  <TextInput
-                    style={styles.pageInput}
-                    placeholder="Enter account type (Eg: Current, Salary)"
-                    value={accountType}
-                    onChangeText={setAccountType}
-                    returnKeyType="done"
-                    placeholderTextColor="#999"
-                  />
-                </View>
-                <Text style={styles.label}>Account Opening Balance</Text>
-                <View>
-                  <TextInput
-                    style={styles.pageInput}
-                    placeholder="Enter opening balance (Rs)"
-                    value={openingBalance.toString()}
-                    onChangeText={(text) => setOpeningBalance(Number(text))}
-                    keyboardType="numeric"
+                    placeholder="Enter Category Name"
+                    value={categoryName}
+                    onChangeText={setCategoryName}
                     returnKeyType="done"
                     placeholderTextColor="#999"
                   />
@@ -212,7 +189,7 @@ const Accounts = () => {
 
                 <TouchableOpacity
                   style={styles.cancelButton}
-                  onPress={() => setModelVisible(false)}
+                  onPress={() => setModelView(false)}
                 >
                   <Text
                     style={{
@@ -233,4 +210,4 @@ const Accounts = () => {
   );
 };
 
-export default Accounts;
+export default Category;

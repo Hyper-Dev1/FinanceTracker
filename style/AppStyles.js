@@ -62,13 +62,25 @@ const styles = StyleSheet.create({
   // ************** Home Header **************
 
   homeHeader: {
-    height: 80,
+    backgroundColor: "#212529",
+    borderRadius: 12,
+    paddingVertical: 24,
+    paddingHorizontal: 20,
     alignItems: "center",
     justifyContent: "center",
+    marginVertical: 5,
+  },
+  homeHeaderLabel: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 12,
+    color: "#888",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 8,
   },
   homeHeaderAmount: {
     fontFamily: "SpaceMono_400Regular",
-    fontSize: 32,
+    fontSize: 36,
     color: "white",
     textAlign: "center",
   },
@@ -78,10 +90,10 @@ const styles = StyleSheet.create({
   accountHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignContent: "center",
+    alignItems: "center",
   },
   addAccountButton: {
-    borderWidth: 0,
+    padding: 8,
   },
   accountHeaderText: {
     fontFamily: "SpaceMono_400Regular",
@@ -89,25 +101,125 @@ const styles = StyleSheet.create({
     color: "white",
   },
   accountCardGroup: {
-    marginTop: 10,
+    marginTop: 12,
     flexDirection: "row",
-    gap: 15,
+    gap: 12,
   },
   accountCard: {
+    backgroundColor: "#212529",
+    height: 100,
+    width: 160,
+    borderRadius: 10,
+    padding: 14,
+    justifyContent: "space-between",
+  },
+  accountCardAnnotation: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "600",
+  },
+  accountCardBalance: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "#e0e0e0",
+  },
+  accountCardType: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 11,
+    color: "#666",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  accountCardText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "white",
+  },
+  accountEmptyText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "#666",
+  },
+
+  // ************** Budget  **************
+  budgetCard: {
     borderWidth: 1,
     borderColor: "white",
     borderCurve: "circular",
-    height: 90,
+    // height: 90,
     width: 180,
     borderRadius: 5,
     padding: 10,
   },
-  accountCardText: {
+  priceRow: {
+    marginTop: 5,
+  },
+  budgetCardIconRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+  highlight: {
+    color: "gray",
+  },
+  budgetCardText: {
     fontFamily: "SpaceMono_400Regular",
     fontSize: 15,
     color: "white",
   },
 
+  // ************** Summary **************
+
+  summaryHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  addSummaryButton: {
+    padding: 8,
+  },
+  summaryHeaderText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 16,
+    color: "white",
+  },
+  summaryCardGroup: {
+    backgroundColor: "#212529",
+    padding: 16,
+    marginTop: 12,
+    flexDirection: "row",
+    gap: 12,
+    width: "100%",
+    justifyContent: "space-between",
+    borderRadius: 10,
+  },
+  summaryCard: {
+    flex: 1,
+    backgroundColor: "#2a2a2a",
+    borderRadius: 8,
+    padding: 14,
+    alignItems: "center",
+  },
+  summaryCardLabel: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 11,
+    color: "#888",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  summaryCardValue: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 18,
+    color: "#fff",
+  },
+  summaryCardText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 15,
+    color: "white",
+    textAlign: "center",
+  },
   // ************** Transaction  **************
 
   transactiontPageHeader: {
@@ -121,15 +233,28 @@ const styles = StyleSheet.create({
     color: "white",
   },
 
+  // ************** Report Page  **************
+
+  reportPageHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignContent: "center",
+  },
+  reportPageHeaderText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 20,
+    color: "white",
+  },
+
   // ************** Transaction Component **************
 
   transactiontHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignContent: "center",
+    alignItems: "center",
   },
   transactionButton: {
-    borderWidth: 0,
+    padding: 8,
   },
   transactionHeaderText: {
     fontFamily: "SpaceMono_400Regular",
@@ -137,26 +262,59 @@ const styles = StyleSheet.create({
     color: "white",
   },
   transactionCardGroup: {
-    marginTop: 10,
-    // flexDirection: "row",
-    gap: 15,
+    marginTop: 12,
+    gap: 10,
   },
   transactionCard: {
-    borderWidth: 1,
-    borderColor: "white",
-    borderCurve: "circular",
-    height: "auto",
-    width: "100%",
-    borderRadius: 5,
-    padding: 10,
+    backgroundColor: "#212529",
+    borderRadius: 10,
+    padding: 14,
     flexDirection: "row",
-    alignContent: "center",
+    alignItems: "center",
     justifyContent: "space-between",
+  },
+  transactionCardLeft: {
+    flex: 1,
+  },
+  transactionCardCategory: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "#fff",
+  },
+  transactionCardAccount: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 12,
+    color: "#666",
+    marginTop: 2,
+  },
+  transactionCardRight: {
+    alignItems: "flex-end",
+  },
+  transactionCardAmount: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "#fff",
+  },
+  transactionCardAmountDeduct: {
+    color: "#888",
+  },
+  transactionCardDate: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 11,
+    color: "#666",
+    marginTop: 2,
   },
   transactionCardText: {
     fontFamily: "SpaceMono_400Regular",
     fontSize: 15,
     color: "white",
+  },
+  transactionEmptyText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
+    paddingVertical: 20,
   },
 
   // ************** Modal **************
@@ -471,6 +629,421 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "white",
     paddingBottom: 10,
+  },
+
+  // ************** Report Page Charts **************
+
+  reportSection: {
+    marginTop: 20,
+  },
+  reportSectionTitle: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 16,
+    color: "white",
+    marginBottom: 10,
+  },
+  chartContainer: {
+    backgroundColor: "#212529",
+    borderRadius: 10,
+    padding: 15,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  chartLegend: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 20,
+    marginTop: 15,
+  },
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  legendText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 12,
+    color: "#999",
+  },
+  totalSummaryContainer: {
+    backgroundColor: "#212529",
+    borderRadius: 10,
+    padding: 15,
+    marginTop: 15,
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  totalSummaryItem: {
+    alignItems: "center",
+  },
+  totalSummaryLabel: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 12,
+    color: "#999",
+    marginBottom: 5,
+  },
+  totalSummaryValue: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 18,
+    color: "white",
+  },
+  totalSummaryValueIncome: {
+    color: "#e0e0e0",
+  },
+  totalSummaryValueSpending: {
+    color: "#888",
+  },
+
+  // ************** Date Filter UI **************
+
+  dateFilterContainer: {
+    backgroundColor: "#212529",
+    borderRadius: 10,
+    padding: 15,
+    marginTop: 10,
+  },
+  dateFilterRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  dateFilterLabel: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "#999",
+    width: 50,
+  },
+  dateFilterInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#444",
+    borderRadius: 8,
+    padding: 10,
+    color: "white",
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    backgroundColor: "#1a1a1a",
+  },
+  settingsIconButton: {
+    padding: 8,
+  },
+  quickFilterContainer: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 15,
+  },
+  quickFilterButton: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    backgroundColor: "#333",
+    alignItems: "center",
+  },
+  quickFilterButtonActive: {
+    backgroundColor: "#555",
+  },
+  quickFilterText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 12,
+    color: "#999",
+  },
+  quickFilterTextActive: {
+    color: "white",
+  },
+
+  // ************** Ledger Cards **************
+
+  ledgerSection: {
+    marginTop: 15,
+  },
+  ledgerCard: {
+    backgroundColor: "#212529",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  ledgerCardLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  ledgerCardIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#333",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ledgerCardTitle: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "white",
+  },
+  ledgerCardSubtitle: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 12,
+    color: "#888",
+    marginTop: 2,
+  },
+  ledgerCardAmount: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 16,
+    color: "white",
+  },
+  ledgerCardAmountIncome: {
+    color: "#e0e0e0",
+  },
+  ledgerCardAmountSpending: {
+    color: "#888",
+  },
+
+  // ************** Category Modal **************
+
+  categoryModalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "flex-end",
+  },
+  categoryModalContent: {
+    backgroundColor: "#1a1a1a",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    minHeight: "80%",
+    maxHeight: "90%",
+  },
+  categoryModalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#333",
+  },
+  categoryModalHeaderLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  categoryModalTitle: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 18,
+    color: "white",
+  },
+  categoryModalBody: {
+    padding: 16,
+  },
+  pieChartContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  categoryListItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#333",
+  },
+  categoryListLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  categoryColorDot: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+  },
+  categoryName: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "white",
+  },
+  categoryAmount: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "#999",
+  },
+  categoryPercentage: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 12,
+    color: "#666",
+    marginLeft: 8,
+  },
+
+  // ************** Summary Card Pressable **************
+
+  summaryCardPressable: {
+    width: "48%",
+    borderWidth: 1,
+    borderColor: "gray",
+    borderRadius: 5,
+    padding: 5,
+  },
+
+  // ************** Profile Screen **************
+
+  profileSection: {
+    marginTop: 20,
+    backgroundColor: "#212529",
+    borderRadius: 10,
+    padding: 15,
+  },
+  profileSectionTitle: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "#888",
+    marginBottom: 10,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  profileInfoItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#333",
+  },
+  profileInfoItemLast: {
+    borderBottomWidth: 0,
+  },
+  profileInfoLabel: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "#888",
+  },
+  profileInfoValue: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "#fff",
+  },
+  profileButton: {
+    backgroundColor: "#333",
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  profileButtonText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 16,
+    color: "#fff",
+  },
+  logoutButton: {
+    backgroundColor: "#fff",
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  logoutButtonText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 16,
+    color: "#000",
+  },
+
+  // ************** Category Screen Header **************
+
+  categoryScreenHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#333",
+    marginBottom: 15,
+  },
+  categoryScreenHeaderLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  categoryScreenTitle: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 20,
+    color: "#fff",
+  },
+  headerIconButton: {
+    padding: 8,
+  },
+
+  // ************** Forecast Card **************
+
+  forecastCard: {
+    backgroundColor: "#212529",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    marginTop: 10,
+  },
+  forecastHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  forecastTitle: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 16,
+    color: "#fff",
+    letterSpacing: 0.5,
+  },
+  forecastMessage: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 14,
+    color: "#e0e0e0",
+    marginBottom: 16,
+    lineHeight: 22,
+  },
+  forecastStats: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#1a1a1a",
+    borderRadius: 8,
+    padding: 12,
+  },
+  forecastStatItem: {
+    flex: 1,
+    alignItems: "center",
+  },
+  forecastStatLabel: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 10,
+    color: "#888",
+    textTransform: "uppercase",
+    marginBottom: 4,
+  },
+  forecastStatValue: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 16,
+    color: "#fff",
+  },
+  forecastAlert: {
+    marginTop: 12,
+    padding: 10,
+    backgroundColor: "rgba(244, 67, 54, 0.1)",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "rgba(244, 67, 54, 0.3)",
+  },
+  forecastAlertText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 12,
+    color: "#ff8a80",
+    textAlign: "center",
   },
 });
 

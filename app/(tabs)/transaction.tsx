@@ -23,7 +23,7 @@ const Transaction = () => {
   const [accounts, setAccounts] = useState<account[]>([]);
   const [categories, setCategories] = useState<category[]>([]);
   const [recordAccounts, setRecordAccounts] = useState<Record<string, string>>(
-    {}
+    {},
   );
   const [recordCategories, setRecordCategories] = useState<
     Record<string, string>
@@ -33,7 +33,8 @@ const Transaction = () => {
   const [selectedBank, setSelectedBank] = useState("");
   const [selectedDateRange, setSelectedDateRange] = useState("");
 
-  // Load accounts and categories once
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+
   useEffect(() => {
     const loadStaticData = async () => {
       try {
@@ -45,8 +46,9 @@ const Transaction = () => {
         setRecordAccounts(recordAccData);
         setRecordCategories(recordCatData);
         setCategories(catData);
+        setIsDataLoaded(true);
       } catch (err) {
-        console.error("Error loading static data:", err);
+        // console.error("Error loading static data:", err);
       }
     };
 
@@ -55,6 +57,7 @@ const Transaction = () => {
 
   // Fetch transactions whenever filters change
   useEffect(() => {
+    if (!isDataLoaded) return;
     const loadTransactions = async () => {
       try {
         const now = new Date();
@@ -67,7 +70,7 @@ const Transaction = () => {
             startDate = new Date(
               now.getFullYear(),
               now.getMonth(),
-              now.getDate()
+              now.getDate(),
             );
             endDate = now;
             break;
@@ -109,17 +112,17 @@ const Transaction = () => {
           txData,
           recordAccounts,
           recordCategories,
-          filter
+          filter,
         );
 
         setTransactions(parsedTxData);
       } catch (error) {
-        console.error("Error loading transactions:", error);
+        // console.error("Error loading transactions:", error);
       }
     };
 
     loadTransactions();
-  }, [selectedLedger, selectedBank, selectedDateRange]);
+  }, [selectedLedger, selectedBank, selectedDateRange, isDataLoaded]);
 
   return (
     <ScrollView

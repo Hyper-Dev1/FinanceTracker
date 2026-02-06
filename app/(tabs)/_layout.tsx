@@ -5,7 +5,6 @@ import {
   CreditCard,
   GalleryHorizontalIcon,
   Home,
-  Landmark,
   User,
 } from "lucide-react-native";
 import React, { useCallback } from "react";
@@ -65,24 +64,15 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="category"
+          name="report"
           options={{
-            title: "Category",
+            title: "Report",
             tabBarIcon: ({ color, size }) => (
               <GalleryHorizontalIcon
                 color={color}
                 size={size}
                 strokeWidth={1.8}
               />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="account"
-          options={{
-            title: "Account",
-            tabBarIcon: ({ color, size }) => (
-              <Landmark color={color} size={size} strokeWidth={1.8} />
             ),
           }}
         />

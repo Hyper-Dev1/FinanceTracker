@@ -1,7 +1,6 @@
 import { account, category, transaction } from "@/components/type";
 import { auth, db } from "@/config/firebase";
-import { router } from "expo-router";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import {
   addDoc,
   collection,
@@ -15,14 +14,6 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    signOut(auth).then(() => {
-      router.replace("/(onboarding)");
-    });
-  }
-});
 
 interface TransactionFilter {
   category?: string;
@@ -152,7 +143,7 @@ export const getAllTransaction = async (
   filters?: TransactionFilter,
 ): Promise<transaction[]> => {
   const user = auth.currentUser;
-  if (!user) throw new Error("Not authenticated");
+  if (!user) return [];
 
   let q = query(
     collection(db, "transaction"),
