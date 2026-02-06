@@ -21,7 +21,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "googleServicesFile": "./google-services.json",
-      "package": "com.anonymous.SimpleFinance"
+      "package": "com.android.finance_tracker"
     },
     "web": {
       "output": "static",
@@ -48,6 +48,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "01d442e7-453b-4cca-8878-82dac4f62b07"
+      }
     }
   }
 }
