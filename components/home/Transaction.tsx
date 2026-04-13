@@ -13,6 +13,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import TransactionItem from "../../components/home/TransactionItem";
+import TransactionDetailModal from "../pages/TransactionDetailModal";
 
 const Transaction = () => {
   const [transactions, setTransactions] = useState<transaction[]>([]);
@@ -24,6 +25,10 @@ const Transaction = () => {
   >({});
 
   const [loading, setLoading] = useState(true);
+  const [detailVisible, setDetailVisible] = useState(false);
+  const [selectedTransactionId, setSelectedTransactionId] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     const loadStaticData = async () => {
@@ -42,28 +47,28 @@ const Transaction = () => {
     loadStaticData();
   }, []);
 
+  const loadTransactions = async () => {
+    try {
+      const filter = {};
+
+      const txData = await getAllTransaction();
+      const parsedTxData = filterAndParseTransactions(
+        txData,
+        recordAccounts,
+        recordCategories,
+        filter,
+      );
+
+      setTransactions(parsedTxData);
+      setLoading(false);
+    } catch (error) {
+      // console.error("Error loading transactions:", error);
+    }
+  };
+
   useEffect(() => {
-    const loadTransactions = async () => {
-      try {
-        const filter = {};
-
-        const txData = await getAllTransaction();
-        const parsedTxData = filterAndParseTransactions(
-          txData,
-          recordAccounts,
-          recordCategories,
-          filter,
-        );
-
-        setTransactions(parsedTxData);
-        setLoading(false);
-      } catch (error) {
-        // console.error("Error loading transactions:", error);
-      }
-    };
-
     loadTransactions();
-  }, [recordAccounts, recordCategories, transactions]);
+  }, [recordAccounts, recordCategories]);
 
   if (loading) {
     return (
@@ -83,11 +88,34 @@ const Transaction = () => {
         {transactions.length > 0 ? (
           transactions
             .slice(0, 5)
-            .map((tx) => <TransactionItem data={tx} key={tx.id} />)
+            .map((tx) => (
+              <TransactionItem
+                data={tx}
+                key={tx.id}
+                onPress={(id) => {
+                  setSelectedTransactionId(id);
+                  setDetailVisible(true);
+                }}
+              />
+            ))
         ) : (
           <Text style={styles.transactionEmptyText}>No transactions yet</Text>
         )}
       </View>
+
+      <TransactionDetailModal
+        visible={detailVisible}
+        transactionId={selectedTransactionId}
+        onClose={() => setDetailVisible(false)}
+        onEdit={(id) => {
+          setDetailVisible(false);
+          // TODO: Will be handled in next phase
+        }}
+        onDeleted={() => {
+          setDetailVisible(false);
+          loadTransactions();
+        }}
+      />
     </View>
   );
 };

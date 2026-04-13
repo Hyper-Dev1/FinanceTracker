@@ -1,9 +1,11 @@
 import HorizontalLine from "@/components/common/HorizontalLine";
+import SwipeableRow from "@/components/common/SwipeableRow";
 import { category } from "@/components/type";
 import {
   createCategory,
   deleteCategory,
   getAllCategory,
+  updateCategory,
 } from "@/database/firebaseOperation";
 import styles from "@/style/AppStyles";
 import { ArrowLeft, Plus, X } from "lucide-react-native";
@@ -32,8 +34,10 @@ const Category = ({ onClose }: CategoryProps) => {
   const amountRef = useRef<TextInput>(null);
   const [categoryName, setCategoryName] = useState("");
   const [modelView, setModelView] = useState(false);
+  const [isExpenseCategory, setIsExpenseCategory] = useState(true);
+  const [editingCategory, setEditingCategory] = useState<category | null>(null);
 
-  useEffect(() => {
+  useEffect(() => { 
     loadData();
   }, []);
 
@@ -48,12 +52,24 @@ const Category = ({ onClose }: CategoryProps) => {
 
   const handleAdd = () => {
     try {
-      createCategory(categoryName);
+      if (editingCategory) {
+        // Update existing category
+        updateCategory({
+          id: editingCategory.id,
+          category_name: categoryName,
+          is_deduct: isExpenseCategory,
+        });
+      } else {
+        // Create new category
+        createCategory(categoryName, isExpenseCategory);
+      }
       loadData();
       setModelView(false);
       setCategoryName("");
+      setIsExpenseCategory(true);
+      setEditingCategory(null);
     } catch {
-      console.log("Error adding category");
+      console.log("Error adding/updating category");
     }
   };
 
@@ -82,6 +98,13 @@ const Category = ({ onClose }: CategoryProps) => {
     if (onClose) {
       onClose();
     }
+  };
+
+  const handleEdit = (item: category) => {
+    setEditingCategory(item);
+    setCategoryName(item.category_name);
+    setIsExpenseCategory(item.is_deduct);
+    setModelView(true);
   };
 
   return (
@@ -113,17 +136,61 @@ const Category = ({ onClose }: CategoryProps) => {
         </View>
 
         {categoryList.map((c) => (
-          <TouchableOpacity
+          <SwipeableRow
             key={c.id}
-            onLongPress={() => handleDelete({ id: c.id })}
-            delayLongPress={250}
+            onEdit={() => handleEdit(c)}
+            onDelete={() => handleDelete(c)}
           >
-            <View>
-              <View style={styles.ledgerItem}>
-                <Text style={styles.ledgerText}>{c.category_name}</Text>
+            <View
+              style={[
+                styles.ledgerItem,
+                {
+                  borderLeftWidth: 4,
+                  borderLeftColor: c.is_deduct ? "#ef4444" : "#22c55e",
+                  backgroundColor: "#252525",
+                  borderColor: "#333",
+                },
+              ]}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: c.is_deduct ? "#ef444415" : "#22c55e15",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: c.is_deduct ? "#ef4444" : "#22c55e",
+                      fontWeight: "bold",
+                      fontSize: 20,
+                    }}
+                  >
+                    {c.is_deduct ? "−" : "+"}
+                  </Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.ledgerText}>{c.category_name}</Text>
+                  <Text
+                    style={{
+                      fontFamily: "SpaceMono_400Regular",
+                      fontSize: 11,
+                      color: "#666",
+                      marginTop: 2,
+                      textTransform: "uppercase",
+                      letterSpacing: 0.5,
+                    }}
+                  >
+                    {c.is_deduct ? "Expense" : "Income"}
+                  </Text>
+                </View>
               </View>
             </View>
-          </TouchableOpacity>
+          </SwipeableRow>
         ))}
       </ScrollView>
       <TouchableOpacity
@@ -136,7 +203,12 @@ const Category = ({ onClose }: CategoryProps) => {
           },
         ]}
         activeOpacity={0.8}
-        onPress={() => setModelView(true)}
+        onPress={() => {
+          setEditingCategory(null);
+          setCategoryName("");
+          setIsExpenseCategory(true);
+          setModelView(true);
+        }}
       >
         <Plus color="#000" size={26} />
       </TouchableOpacity>
@@ -144,15 +216,27 @@ const Category = ({ onClose }: CategoryProps) => {
         transparent
         animationType="slide"
         visible={modelView}
-        onRequestClose={() => setModelView(false)}
+        onRequestClose={() => {
+          setModelView(false);
+          setEditingCategory(null);
+          setCategoryName("");
+          setIsExpenseCategory(true);
+        }}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Add Category</Text>
+              <Text style={styles.modalTitle}>
+                {editingCategory ? "Edit Category" : "Add Category"}
+              </Text>
               <TouchableOpacity
                 style={styles.closeButton}
-                onPress={() => setModelView(false)}
+                onPress={() => {
+                  setModelView(false);
+                  setEditingCategory(null);
+                  setCategoryName("");
+                  setIsExpenseCategory(true);
+                }}
               >
                 <X size={22} color="#ffffff" />
               </TouchableOpacity>
@@ -164,7 +248,42 @@ const Category = ({ onClose }: CategoryProps) => {
                 style={styles.modalContainer}
               >
                 <HorizontalLine />
-                <Text style={styles.label}>Add Category</Text>
+                <Text style={styles.label}>Category Type</Text>
+                <View style={styles.toggleContainer}>
+                  <TouchableOpacity
+                    style={[
+                      styles.toggleButton,
+                      isExpenseCategory && styles.toggleButtonActive,
+                    ]}
+                    onPress={() => setIsExpenseCategory(true)}
+                  >
+                    <Text
+                      style={[
+                        styles.toggleButtonText,
+                        isExpenseCategory && styles.toggleButtonTextActive,
+                      ]}
+                    >
+                      − Expense
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.toggleButton,
+                      !isExpenseCategory && styles.toggleButtonActive,
+                    ]}
+                    onPress={() => setIsExpenseCategory(false)}
+                  >
+                    <Text
+                      style={[
+                        styles.toggleButtonText,
+                        !isExpenseCategory && styles.toggleButtonTextActive,
+                      ]}
+                    >
+                      + Income
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.label}>Category Name</Text>
                 <View>
                   <TextInput
                     ref={amountRef}
@@ -183,13 +302,18 @@ const Category = ({ onClose }: CategoryProps) => {
                       fontSize: 16,
                     }}
                   >
-                    Add
+                    {editingCategory ? "Save" : "Add"}
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={styles.cancelButton}
-                  onPress={() => setModelView(false)}
+                  onPress={() => {
+                    setModelView(false);
+                    setEditingCategory(null);
+                    setCategoryName("");
+                    setIsExpenseCategory(true);
+                  }}
                 >
                   <Text
                     style={{

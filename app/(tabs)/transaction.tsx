@@ -15,6 +15,7 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TransactionItem from "../../components/home/TransactionItem";
+import TransactionDetailModal from "../../components/pages/TransactionDetailModal";
 
 const Transaction = () => {
   const insets = useSafeAreaInsets();
@@ -34,6 +35,10 @@ const Transaction = () => {
   const [selectedDateRange, setSelectedDateRange] = useState("");
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [detailVisible, setDetailVisible] = useState(false);
+  const [selectedTransactionId, setSelectedTransactionId] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     const loadStaticData = async () => {
@@ -56,71 +61,71 @@ const Transaction = () => {
   }, []);
 
   // Fetch transactions whenever filters change
+  const loadTransactions = async () => {
+    try {
+      const now = new Date();
+
+      let startDate: Date | undefined;
+      let endDate: Date | undefined;
+
+      switch (selectedDateRange) {
+        case "today":
+          startDate = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+          );
+          endDate = now;
+          break;
+
+        case "week":
+          startDate = new Date(now);
+          startDate.setDate(startDate.getDate() - 7);
+          endDate = now;
+          break;
+
+        case "month":
+          startDate = new Date(now);
+          startDate.setMonth(startDate.getMonth() - 1);
+          endDate = now;
+          break;
+
+        case "year":
+          startDate = new Date(now);
+          startDate.setFullYear(startDate.getFullYear() - 1);
+          endDate = now;
+          break;
+
+        case "all":
+        default:
+          startDate = undefined;
+          endDate = undefined;
+          break;
+      }
+
+      const filter = {
+        categoryId: selectedLedger,
+        accountId: selectedBank,
+        startDate: startDate,
+        endDate: endDate,
+      };
+
+      const txData = await getAllTransaction();
+      const parsedTxData = filterAndParseTransactions(
+        txData,
+        recordAccounts,
+        recordCategories,
+        filter,
+      );
+
+      setTransactions(parsedTxData);
+    } catch (error) {
+      // console.error("Error loading transactions:", error);
+    }
+  };
+
   useEffect(() => {
     if (!isDataLoaded) return;
-    const loadTransactions = async () => {
-      try {
-        const now = new Date();
-
-        let startDate: Date | undefined;
-        let endDate: Date | undefined;
-
-        switch (selectedDateRange) {
-          case "today":
-            startDate = new Date(
-              now.getFullYear(),
-              now.getMonth(),
-              now.getDate(),
-            );
-            endDate = now;
-            break;
-
-          case "week":
-            startDate = new Date(now);
-            startDate.setDate(startDate.getDate() - 7);
-            endDate = now;
-            break;
-
-          case "month":
-            startDate = new Date(now);
-            startDate.setMonth(startDate.getMonth() - 1);
-            endDate = now;
-            break;
-
-          case "year":
-            startDate = new Date(now);
-            startDate.setFullYear(startDate.getFullYear() - 1);
-            endDate = now;
-            break;
-
-          case "all":
-          default:
-            startDate = undefined;
-            endDate = undefined;
-            break;
-        }
-
-        const filter = {
-          categoryId: selectedLedger,
-          accountId: selectedBank,
-          startDate: startDate,
-          endDate: endDate,
-        };
-
-        const txData = await getAllTransaction();
-        const parsedTxData = filterAndParseTransactions(
-          txData,
-          recordAccounts,
-          recordCategories,
-          filter,
-        );
-
-        setTransactions(parsedTxData);
-      } catch (error) {
-        // console.error("Error loading transactions:", error);
-      }
-    };
-
     loadTransactions();
   }, [selectedLedger, selectedBank, selectedDateRange, isDataLoaded]);
 
@@ -208,13 +213,36 @@ const Transaction = () => {
       {/* Transaction list */}
       <View style={styles.transactionCardGroup}>
         {transactions.length > 0 ? (
-          transactions.map((tx) => <TransactionItem data={tx} key={tx.id} />)
+          transactions.map((tx) => (
+            <TransactionItem
+              data={tx}
+              key={tx.id}
+              onPress={(id) => {
+                setSelectedTransactionId(id);
+                setDetailVisible(true);
+              }}
+            />
+          ))
         ) : (
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>No transactions found</Text>
           </View>
         )}
       </View>
+
+      <TransactionDetailModal
+        visible={detailVisible}
+        transactionId={selectedTransactionId}
+        onClose={() => setDetailVisible(false)}
+        onEdit={(id) => {
+          setDetailVisible(false);
+          // TODO: Will be handled in next phase
+        }}
+        onDeleted={() => {
+          setDetailVisible(false);
+          loadTransactions();
+        }}
+      />
     </ScrollView>
   );
 };

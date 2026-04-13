@@ -15,6 +15,8 @@ export type account = {
 export type category = {
   id: string;
   category_name: string;
+  is_deduct: boolean; // true = expense category, false = income category
+  user_id: string;
 };
 
 export type transaction = {
@@ -32,4 +34,14 @@ export type User = {
   email: string;
   name: string;
   uid: string;
+};
+
+export type budget = {
+  id: string;
+  category_id: string;
+  category_name?: string; // Enriched field
+  allocated_amount: number;
+  month: string; // Format: "YYYY-MM"
+  user_id: string;
+  createdAt: Timestamp;
 };

@@ -1,3 +1,4 @@
+import Budget from "@/components/pages/Budget";
 import Category from "@/components/pages/Category";
 import { User } from "@/components/type";
 import { auth } from "@/config/firebase";
@@ -20,6 +21,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const Profile = () => {
   const [user, setUser] = useState<User>();
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
+  const [budgetModalVisible, setBudgetModalVisible] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -92,6 +94,13 @@ const Profile = () => {
         >
           <Text style={styles.profileButtonText}>Manage Category</Text>
         </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.profileButton, { marginTop: 10 }]}
+          onPress={() => setBudgetModalVisible(true)}
+        >
+          <Text style={styles.profileButtonText}>Manage Budget</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Logout Button */}
@@ -107,6 +116,12 @@ const Profile = () => {
       >
         <Category onClose={() => setCategoryModalVisible(false)} />
       </Modal>
+
+      {/* Budget Modal */}
+      <Budget
+        visible={budgetModalVisible}
+        onClose={() => setBudgetModalVisible(false)}
+      />
     </ScrollView>
   );
 };

@@ -1,9 +1,11 @@
 import ForecastCard from "@/components/common/ForecastCard";
 import HorizontalLine from "@/components/common/HorizontalLine";
-import { category, transaction } from "@/components/type";
+import Budget from "@/components/pages/Budget";
+import { budget, category, transaction } from "@/components/type";
 import {
   getAllCategory,
   getAllTransaction,
+  getBudgetsForMonth,
 } from "@/database/firebaseOperation";
 import styles from "@/style/AppStyles";
 import {
@@ -11,6 +13,14 @@ import {
   ForecastResult,
 } from "@/utils/BalanceForecast";
 import {
+  calculateBudgetStatus,
+  filterTransactionsByMonth,
+  formatMonthDisplay,
+  getBudgetStatusColor,
+  getCurrentMonth,
+} from "@/utils/BudgetCalculations";
+import {
+  AlertCircle,
   ArrowLeft,
   Settings,
   TrendingDown,
@@ -24,6 +34,7 @@ import {
   ScrollView,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { BarChart, PieChart } from "react-native-gifted-charts";
@@ -57,6 +68,7 @@ const Report = () => {
   // Data state
   const [transactions, setTransactions] = useState<transaction[]>([]);
   const [categories, setCategories] = useState<category[]>([]);
+  const [budgets, setBudgets] = useState<budget[]>([]);
 
   // Filter state
   const [showFilters, setShowFilters] = useState(false);
@@ -72,6 +84,9 @@ const Report = () => {
   // Forecast State
   const [forecast, setForecast] = useState<ForecastResult | null>(null);
 
+  // Budget Modal state
+  const [budgetModalVisible, setBudgetModalVisible] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -81,12 +96,34 @@ const Report = () => {
         ]);
         setTransactions(txns);
         setCategories(cats);
+
+        // Fetch budgets for current month
+        await loadBudgets();
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
     fetchData();
   }, []);
+
+  const loadBudgets = async () => {
+    try {
+      const currentMonth = getCurrentMonth();
+      const monthBudgets = await getBudgetsForMonth(currentMonth);
+
+      // Enrich budgets with category names
+      const enrichedBudgets = monthBudgets.map((b) => ({
+        ...b,
+        category_name:
+          categories.find((c) => c.id === b.category_id)?.category_name ||
+          "Unknown",
+      }));
+
+      setBudgets(enrichedBudgets);
+    } catch (error) {
+      console.error("Error loading budgets:", error);
+    }
+  };
 
   // Get date range based on filter type
   const getDateRange = (): { start: Date; end: Date } => {
@@ -183,6 +220,26 @@ const Report = () => {
       setForecast(prediction);
     }
   }, [transactions, totalIncome, totalSpending]);
+
+  // Reload budgets when categories are loaded
+  useEffect(() => {
+    if (categories.length > 0) {
+      loadBudgets();
+    }
+  }, [categories]);
+
+  // Calculate budget statuses for current month
+  const budgetStatuses = useMemo(() => {
+    const currentMonth = getCurrentMonth();
+    const monthTransactions = filterTransactionsByMonth(
+      transactions,
+      currentMonth,
+    );
+
+    return budgets.map((budget) =>
+      calculateBudgetStatus(budget, monthTransactions),
+    );
+  }, [budgets, transactions]);
 
   // Bar chart data
   const barData = [
@@ -341,6 +398,70 @@ const Report = () => {
           )}
         </View>
       )}
+
+      <HorizontalLine />
+
+      {/* Budget Overview Section */}
+      <View style={styles.budgetOverviewSection}>
+        <View style={styles.budgetOverviewHeader}>
+          <Text style={styles.budgetOverviewTitle}>
+            Budget Overview - {formatMonthDisplay(getCurrentMonth())}
+          </Text>
+          <TouchableOpacity
+            style={styles.manageBudgetButton}
+            onPress={() => setBudgetModalVisible(true)}
+          >
+            <Text style={styles.manageBudgetButtonText}>
+              <Settings size={20} stroke={"#ffffff"} />
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {budgetStatuses.length > 0 ? (
+          budgetStatuses.map((budgetStatus) => {
+            const { budget, spentAmount, percentageUsed, status } =
+              budgetStatus;
+            const statusColor = getBudgetStatusColor(status);
+            const progressWidth = Math.min(percentageUsed, 100);
+
+            return (
+              <View key={budget.id} style={styles.budgetItemCard}>
+                <View style={styles.budgetItemHeader}>
+                  <Text style={styles.budgetCategoryName}>
+                    {budget.category_name || "Unknown"}
+                  </Text>
+                  <Text style={styles.budgetAmountText}>
+                    Rs {spentAmount.toLocaleString()} / Rs{" "}
+                    {budget.allocated_amount.toLocaleString()}
+                  </Text>
+                </View>
+                <View style={styles.budgetProgressBarContainer}>
+                  <View
+                    style={[
+                      styles.budgetProgressBar,
+                      {
+                        width: `${progressWidth}%`,
+                        backgroundColor: statusColor,
+                      },
+                    ]}
+                  />
+                </View>
+                <Text style={styles.budgetPercentageText}>
+                  {percentageUsed.toFixed(1)}% used
+                </Text>
+              </View>
+            );
+          })
+        ) : (
+          <View style={styles.budgetEmptyState}>
+            <AlertCircle size={24} color="#666" />
+            <Text style={styles.budgetEmptyStateText}>
+              No budgets set for this month.{"\n"}Tap &ldquo;Manage&rdquo; to
+              create budgets.
+            </Text>
+          </View>
+        )}
+      </View>
 
       <HorizontalLine />
 
@@ -541,6 +662,12 @@ const Report = () => {
           </View>
         </View>
       </Modal>
+
+      {/* Budget Management Modal */}
+      <Budget
+        visible={budgetModalVisible}
+        onClose={() => setBudgetModalVisible(false)}
+      />
     </ScrollView>
   );
 };

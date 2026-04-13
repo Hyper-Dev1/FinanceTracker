@@ -1,6 +1,7 @@
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/config/firebase";
@@ -64,8 +65,10 @@ function Layout() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <Layout />
-    </AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider>
+        <Layout />
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }

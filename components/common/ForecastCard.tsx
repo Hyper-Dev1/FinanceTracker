@@ -36,7 +36,7 @@ const ForecastCard: React.FC<ForecastCardProps> = ({ forecast }) => {
   return (
     <View style={styles.forecastCard}>
       <View style={styles.forecastHeader}>
-        <Text style={styles.forecastTitle}>AI Balance Forecast</Text>
+        <Text style={styles.forecastTitle}>Balance Forecast</Text>
         {trendIcon()}
       </View>
 

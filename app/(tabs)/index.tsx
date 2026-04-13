@@ -56,11 +56,9 @@ const Index = () => {
     const setupDatabase = async () => {
       try {
         const banks = await getAllAccounts();
-        const category = await getAllCategory();
         const allTransactions = await getAllTransaction();
 
         setBankDetails(banks);
-        setCategoryList(category);
 
         // Calculate forecast
         const totalBalance = banks.reduce(
@@ -79,6 +77,26 @@ const Index = () => {
 
     setupDatabase();
   }, []);
+
+  // Fetch categories whenever transaction type changes
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const allCategories = await getAllCategory();
+        // Filter categories based on transaction type
+        // When "deduct" is selected: show expense categories (is_deduct === true)
+        // When "add" is selected: show income categories (is_deduct === false)
+        const filtered = allCategories.filter((c) =>
+          transactionType === "deduct" ? c.is_deduct === true : c.is_deduct === false
+        );
+        setCategoryList(filtered);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, [transactionType]);
 
   const insets = useSafeAreaInsets();
 
