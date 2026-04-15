@@ -84,6 +84,111 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
   },
+  pfhsCard: {
+    backgroundColor: "#212529",
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 10,
+  },
+  pfhsHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  pfhsTitle: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 15,
+    color: "#fff",
+    letterSpacing: 0.5,
+  },
+  pfhsScoreRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 6,
+  },
+  pfhsScoreValue: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 42,
+    color: "#fff",
+    lineHeight: 46,
+  },
+  pfhsScoreMax: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 16,
+    color: "#999",
+    marginBottom: 8,
+  },
+  pfhsStatusBadge: {
+    marginLeft: "auto",
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginBottom: 8,
+  },
+  pfhsStatusText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+  },
+  pfhsSubscores: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#1a1a1a",
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 14,
+  },
+  pfhsSubscoreItem: {
+    flex: 1,
+    alignItems: "center",
+  },
+  pfhsSubscoreLabel: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 10,
+    color: "#888",
+    textTransform: "uppercase",
+    marginBottom: 4,
+  },
+  pfhsSubscoreValue: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 17,
+    color: "#fff",
+  },
+  pfhsBudgetHint: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 12,
+    color: "#fbc02d",
+    marginTop: 12,
+  },
+  pfhsInsightsContainer: {
+    marginTop: 12,
+    gap: 6,
+  },
+  pfhsInsightItem: {
+    backgroundColor: "#1a1a1a",
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+  },
+  pfhsInsightText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 12,
+    color: "#e0e0e0",
+    lineHeight: 18,
+  },
+  pfhsLoadingText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 13,
+    color: "#999",
+  },
+  pfhsEmptyText: {
+    fontFamily: "SpaceMono_400Regular",
+    fontSize: 13,
+    color: "#999",
+  },
 
   // ************** Accounts **************
 
